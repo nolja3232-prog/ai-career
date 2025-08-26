@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 진로 탐색</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #f4f7f6;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            padding: 40px;
+            box-sizing: border-box;
+        }
+        h1, h2, h3 {
+            color: #2c3e50;
+            text-align: center;
+        }
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 0.5em;
+        }
+        h2 {
+            font-size: 1.8em;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            margin-top: 2em;
+        }
+        .intro p {
+            text-align: center;
+            font-size: 1.1em;
+            color: #555;
+            margin-bottom: 20px;
+        }
+        .question-group {
+            margin-bottom: 30px;
+        }
+        .question-group h4 {
+            font-size: 1.2em;
+            color: #34495e;
+            margin-bottom: 15px;
+            text-align: left;
+            padding-left: 20px;
+        }
+        .question {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #ecf0f1;
+            border-radius: 8px;
+        }
+        .question p {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .question label {
+            display: block;
+            background-color: #fff;
+            padding: 12px 20px;
+            margin-bottom: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid #ddd;
+        }
+        .question label:hover {
+            background-color: #f0f0f0;
+            border-color: #3498db;
+        }
+        .question input[type="radio"] {
+            display: none;
+        }
+        .question input[type="radio"]:checked + label {
+            background-color: #3498db;
+            color: #fff;
+            border-color: #3498db;
+            transform: scale(1.02);
+            box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3);
+        }
+        .navigation {
+            text-align: center;
+            margin-top: 30px;
+        }
+        .nav-button {
+            background-color: #3498db;
+            color: #fff;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        .nav-button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+        .nav-button:active {
+            transform: translateY(0);
+        }
+        .nav-button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .page {
+            display: none;
+        }
+        .page.active {
+            display: block;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        .progress {
+            height: 100%;
+            background-color: #3498db;
+            width: 0%;
+            transition: width 0.5s ease-in-out;
+        }
+        .alert {
+            color: #c0392b;
+            text-align: center;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="page-start" class="page active">
+            <div class="intro">
+                <h1>AI 진로 탐색 웹페이지</h1>
+                <p>
+                    안녕하세요! 당신의 AI 진로를 함께 찾아줄 가이드, 제미니입니다. 🤖
+                    <br><br>
+                    지금부터 당신이 어떤 사람인지, 어떤 것에 흥미를 느끼는지 알아보는 과정을 시작할게요.
+                    <br>
+                    솔직하게 답변할수록 더 정확한 결과를 얻을 수 있어요. 준비되셨나요? 😊
+                </p>
+                <div class="navigation">
+                    <button class="nav-button" onclick="showPage('page-1-1')">테스트 시작하기</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="page-1-1" class="page">
+            <h2>나의 강점/관심사 파악하기 (1/5)</h2>
+            <div class="progress-bar">
+                <div class="progress" id="progress-1"></div>
+            </div>
+            <div class="question-group">
+                <h4>문제 해결 및 논리적 사고력</h4>
+                <div class="question" data-question-id="q1-1">
+                    <p>1. 어려운 문제를 만났을 때, 어떻게 해결하는 편인가요?</p>
+                    <input type="radio" id="q1-1-a" name="q1-1" value="A">
+                    <label for="q1-1-a">A. 여러 자료를 조사하고 분석하여 논리적인 해결책을 찾는다.</label>
+                    <input type="radio" id="q1-1-b" name="q1-1" value="B">
+                    <label for="q1-1-b">B. 주변 사람들과 대화하며 다양한 의견을 듣고 해결한다.</label>
+                    <input type="radio" id="q1-1-c" name="q1-1" value="C">
+                    <label for="q1-1-c">C. 일단 행동으로 옮겨보면서 직관적으로 해결한다.</label>
+                </div>
+                <div class="question" data-question-id="q1-2">
+                    <p>2. 복잡한 정보를 접했을 때, 당신의 행동은?</p>
+                    <input type="radio" id="q1-2-a" name="q1-2" value="A">
+                    <label for="q1-2-a">A. 표나 다이어그램을 만들어 체계적으로 정리한다.</label>
+                    <input type="radio" id="q1-2-b" name="q1-2" value="B">
+                    <label for="q1-2-b">B. 핵심만 요약하여 다른 사람에게 설명한다.</label>
+                    <input type="radio" id="q1-2-c" name="q1-2" value="C">
+                    <label for="q1-2-c">C. 일단 나중에 다시 볼 수 있도록 저장해 둔다.</label>
+                </div>
+                <div class="question" data-question-id="q1-3">
+                    <p>3. 새로운 프로젝트를 시작할 때, 당신의 접근 방식은?</p>
+                    <input type="radio" id="q1-3-a" name="q1-3" value="A">
+                    <label for="q1-3-a">A. 전체적인 목표와 계획을 먼저 세우고 세부 단계로 나눈다.</label>
+                    <input type="radio" id="q1-3-b" name="q1-3" value="B">
+                    <label for="q1-3-b">B. 바로 실행 가능한 첫 단계부터 시작하며 즉흥적으로 진행한다.</label>
+                    <input type="radio" id="q1-3-c" name="q1-3" value="C">
+                    <label for="q1-3-c">C. 관련된 경험이 있는 사람에게 조언을 구하며 계획을 세운다.</label>
+                </div>
+                <div class="question" data-question-id="q1-4">
+                    <p>4. 문제가 발생했을 때, 당신은 주로 어떤 역할을 맡나요?</p>
+                    <input type="radio" id="q1-4-a" name="q1-4" value="A">
+                    <label for="q1-4-a">A. 원인을 분석하고 해결책을 제시한다.</label>
+                    <input type="radio" id="q1-4-b" name="q1-4" value="B">
+                    <label for="q1-4-b">B. 갈등을 중재하고 팀원들의 의견을 조율한다.</label>
+                    <input type="radio" id="q1-4-c" name="q1-4" value="C">
+                    <label for="q1-4-c">C. 직접 몸으로 부딪히며 해결한다.</label>
+                </div>
+                <div class="question" data-question-id="q1-5">
+                    <p>5. 어떤 일을 시작하기 전에 가장 중요하게 여기는 것은 무엇인가요?</p>
+                    <input type="radio" id="q1-5-a" name="q1-5" value="A">
+                    <label for="q1-5-a">A. 명확한 목표와 계획을 세우는 것.</label>
+                    <input type="radio" id="q1-5-b" name="q1-5" value="B">
+                    <label for="q1-5-b">B. 함께할 사람들과 충분히 논의하는 것.</label>
+                    <input type="radio" id="q1-5-c" name="q1-5" value="C">
+                    <label for="q1-5-c">C. 필요한 모든 정보를 완벽하게 모으는 것.</label>
+                </div>
+            </div>
+            <div class="navigation">
+                <p class="alert" id="alert-1"></p>
+                <button class="nav-button" onclick="validateAndShowPage('page-1-1', 'page-1-2')">다음 페이지로 넘어가기</button>
+            </div>
+        </div>
+
+        <div id="page-1-2" class="page">
+            <h2>나의 강점/관심사 파악하기 (2/5)</h2>
+            <div class="progress-bar">
+                <div class="progress" id="progress-2"></div>
+            </div>
+            <div class="question-group">
+                <h4>소통 및 협업 역량</h4>
+                <div class="question" data-question-id="q2-1">
+                    <p>1. 새로운 사람들과 함께 일하게 되었을 때, 당신의 역할은?</p>
+                    <input type="radio" id="q2-1-a" name="q2-1" value="A">
+                    <label for="q2-1-a">A. 팀의 목표를 설정하고, 모두를 이끄는 리더 역할을 맡는다.</label>
+                    <input type="radio" id="q2-1-b" name="q2-1" value="B">
+                    <label for="q2-1-b">B. 다른 사람들의 의견을 경청하고 조율하며 팀워크를 돕는다.</label>
+                    <input type="radio" id="q2-1-c" name="q2-1" value="C">
+                    <label for="q2-1-c">C. 주어진 역할을 묵묵히 수행하며 신뢰를 쌓는다.</label>
+                </div>
+                <div class="question" data-question-id="q2-2">
+                    <p>2. 타인에게 어려운 내용을 설명해야 할 때, 당신의 방식은?</p>
+                    <input type="radio" id="q2-2-a" name="q2-2" value="A">
+                    <label for="q2-2-a">A. 상대방의 이해도를 파악하며 눈높이에 맞춰 설명한다.</label>
+                    <input type="radio" id="q2-2-b" name="q2-2" value="B">
+                    <label for="q2-2-b">B. 전문가 용어를 사용해 정확하고 명확하게 설명한다.</label>
+                    <input type="radio" id="q2-2-c" name="q2-2" value="C">
+                    <label for="q2-2-c">C. 예시나 비유를 활용해 직관적으로 이해시킨다.</label>
+                </div>
+                <div class="question" data-question-id="q2-3">
+                    <p>3. 다른 사람으로부터 비판적인 피드백을 들었을 때, 당신의 반응은?</p>
+                    <input type="radio" id="q2-3-a" name="q2-3" value="A">
+                    <label for="q2-3-a">A. 감정적으로 대응하기보다는, 그 피드백의 의도를 분석한다.</label>
+                    <input type="radio" id="q2-3-b" name="q2-3" value="B">
+                    <label for="q2-3-b">B. 일단 기분이 상하지만, 나중에 수용할 점을 찾아본다.</label>
+                    <input type="radio" id="q2-3-c" name="q2-3" value="C">
+                    <label for="q2-3-c">C. 왜 그런 피드백을 받았는지 즉시 대화로 해결하려고 한다.</label>
+                </div>
+                <div class="question" data-question-id="q2-4">
+                    <p>4. 팀원들 사이의 의견 충돌이 발생했을 때, 당신은 어떻게 행동하나요?</p>
+                    <input type="radio" id="q2-4-a" name="q2-4" value="A">
+                    <label for="q2-4-a">A. 각자의 의견을 모두 듣고 절충안을 제안한다.</label>
+                    <input type="radio" id="q2-4-b" name="q2-4" value="B">
+                    <label for="q2-4-b">B. 논리적으로 옳다고 생각하는 의견을 지지하고 관철시킨다.</label>
+                    <input type="radio" id="q2-4-c" name="q2-4" value="C">
+                    <label for="q2-4-c">C. 논쟁이 커지지 않도록 한발 물러나 상황을 지켜본다.</label>
+                </div>
+                <div class="question" data-question-id="q2-5">
+                    <p>5. 당신이 만든 아이디어를 다른 사람에게 발표할 때, 가장 중요한 것은?</p>
+                    <input type="radio" id="q2-5-a" name="q2-5" value="A">
+                    <label for="q2-5-a">A. 아이디어의 논리적인 근거와 데이터를 제시하는 것.</label>
+                    <input type="radio" id="q2-5-b" name="q2-5" value="B">
+                    <label for="q2-5-b">B. 아이디어가 가진 매력과 흥미를 강조하는 것.</label>
+                    <input type="radio" id="q2-5-c" name="q2-5" value="C">
+                    <label for="q2-5-c">C. 청중의 반응을 살피며 발표 방식을 유연하게 바꾸는 것.</label>
+                </div>
+            </div>
+            <div class="navigation">
+                <p class="alert" id="alert-2"></p>
+                <button class="nav-button" onclick="validateAndShowPage('page-1-2', 'page-1-3')">다음 페이지로 넘어가기</button>
+            </div>
+        </div>
+
+        <div id="page-1-3" class="page">
+            <h2>나의 강점/관심사 파악하기 (3/5)</h2>
+            <div class="progress-bar">
+                <div class="progress" id="progress-3"></div>
+            </div>
+            <div class="question-group">
+                <h4>세밀함 및 꼼꼼함</h4>
+                <div class="question" data-question-id="q3-1">
+                    <p>1. 반복적인 작업을 할 때, 당신의 태도는?</p>
+                    <input type="radio" id="q3-1-a" name="q3-1" value="A">
+                    <label for="q3-1-a">A. 집중해서 빠르게 끝내고, 최종 점검은 대략적으로 한다.</label>
+                    <input type="radio" id="q3-1-b" name="q3-1" value="B">
+                    <label for="q3-1-b">B. 정확성과 꼼꼼함을 최우선으로 생각하며 반복적으로 검토한다.</label>
+                    <input type="radio" id="q3-1-c" name="q3-1" value="C">
+                    <label for="q3-1-c">C. 지루함을 느끼지만, 빠르게 해치우려고 노력한다.</label>
+                </div>
+                <div class="question" data-question-id="q3-2">
+                    <p>2. 새로운 기기나 프로그램을 사용할 때, 당신은?</p>
+                    <input type="radio" id="q3-2-a" name="q3-2" value="A">
+                    <label for="q3-2-a">A. 사용설명서를 꼼꼼히 읽어보고 기능 하나하나를 확인한다.</label>
+                    <input type="radio" id="q3-2-b" name="q3-2" value="B">
+                    <label for="q3-2-b">B. 일단 이것저것 눌러보며 직관적으로 사용법을 익힌다.</label>
+                    <input type="radio" id="q3-2-c" name="q3-2" value="C">
+                    <label for="q3-2-c">C. 주변 사람에게 먼저 물어보고 배운다.</label>
+                </div>
+                <div class="question" data-question-id="q3-3">
+                    <p>3. 당신이 만든 문서나 보고서의 완성 기준은 무엇인가요?</p>
+                    <input type="radio" id="q3-3-a" name="q3-3" value="A">
+                    <label for="q3-3-a">A. 오타나 비문이 전혀 없고, 자료 출처가 완벽하게 명시되어야 한다.</label>
+                    <input type="radio" id="q3-3-b" name="q3-3" value="B">
+                    <label for="q3-3-b">B. 핵심 내용만 정확하게 전달되면 충분하다.</label>
+                    <input type="radio" id="q3-3-c" name="q3-3" value="C">
+                    <label for="q3-3-c">C. 기한 내에 제출하는 것을 가장 중요하게 생각한다.</label>
+                </div>
+                <div class="question" data-question-id="q3-4">
+                    <p>4. 집 안의 물건을 정리할 때, 당신의 방식은?</p>
+                    <input type="radio" id="q3-4-a" name="q3-4" value="A">
+                    <label for="q3-4-a">A. 용도별, 종류별로 나누어 체계적으로 수납한다.</label>
+                    <input type="radio" id="q3-4-b" name="q3-4" value="B">
+                    <label for="q3-4-b">B. 일단 보이는 곳에 깔끔하게 쌓아 둔다.</label>
+                    <input type="radio" id="q3-4-c" name="q3-4" value="C">
+                    <label for="q3-4-c">C. 자주 쓰는 물건 위주로만 정리하고 나머지는 방치한다.</label>
+                </div>
+                <div class="question" data-question-id="q3-5">
+                    <p>5. 가장 스트레스받는 상황은?</p>
+                    <input type="radio" id="q3-5-a" name="q3-5" value="A">
+                    <label for="q3-5-a">A. 내가 맡은 일에 실수가 발생했을 때.</label>
+                    <input type="radio" id="q3-5-b" name="q3-5" value="B">
+                    <label for="q3-5-b">B. 타인과의 의견 충돌이 해결되지 않을 때.</label>
+                    <input type="radio" id="q3-5-c" name="q3-5" value="C">
+                    <label for="q3-5-c">C. 새로운 환경에 적응해야 할 때.</label>
+                </div>
+            </div>
+            <div class="navigation">
+                <p class="alert" id="alert-3"></p>
+                <button class="nav-button" onclick="validateAndShowPage('page-1-3', 'page-1-4')">다음 페이지로 넘어가기</button>
+            </div>
+        </div>
+
+        <div id="page-1-4" class="page">
+            <h2>나의 강점/관심사 파악하기 (4/5)</h2>
+            <div class="progress-bar">
+                <div class="progress" id="progress-4"></div>
+            </div>
+            <div class="question-group">
+                <h4>학습 및 적응 역량</h4>
+                <div class="question" data-question-id="q4-1">
+                    <p>1. 새로운 기술이나 지식을 배울 때, 당신의 방식은?</p>
+                    <input type="radio" id="q4-1-a" name="q4-1" value="A">
+                    <label for="q4-1-a">A. 관련 서적이나 온라인 강의를 찾아 체계적으로 학습한다.</label>
+                    <input type="radio" id="q4-1-b" name="q4-1" value="B">
+                    <label for="q4-1-b">B. 커뮤니티나 전문가에게 질문하며 실용적인 정보를 얻는다.</label>
+                    <input type="radio" id="q4-1-c" name="q4-1" value="C">
+                    <label for="q4-1-c">C. 직접 해보면서 시행착오를 통해 익힌다.</label>
+                </div>
+                <div class="question" data-question-id="q4-2">
+                    <p>2. 예상치 못한 상황이 발생했을 때, 당신의 대처법은?</p>
+                    <input type="radio" id="q4-2-a" name="q4-2" value="A">
+                    <label for="q4-2-a">A. 침착하게 현재 상황을 분석하고 계획을 수정한다.</label>
+                    <input type="radio" id="q4-2-b" name="q4-2" value="B">
+                    <label for="q4-2-b">B. 일단 상황을 받아들이고 주변에 도움을 요청한다.</label>
+                    <input type="radio" id="q4-2-c" name="q4-2" value="C">
+                    <label for="q4-2-c">C. 당황하지만, 빠르게 새로운 환경에 적응한다.</label>
+                </div>
+                <div class="question" data-question-id="q4-3">
+                    <p>3. 새로운 분야의 지식을 습득할 때, 당신의 목표는?</p>
+                    <input type="radio" id="q4-3-a" name="q4-3" value="A">
+                    <label for="q4-3-a">A. 그 분야의 전문가가 될 수 있을 만큼 깊이 있게 공부한다.</label>
+                    <input type="radio" id="q4-3-b" name="q4-3" value="B">
+                    <label for="q4-3-b">B. 다른 사람에게 설명해 줄 수 있을 만큼의 지식만 얻는다.</label>
+                    <input type="radio" id="q4-3-c" name="q4-3" value="C">
+                    <label for="q4-3-c">C. 내가 필요한 부분만 골라 학습한다.</label>
+                </div>
+                <div class="question" data-question-id="q4-4">
+                    <p>4. 배운 것을 다른 사람에게 가르쳐야 할 때, 당신의 생각은?</p>
+                    <input type="radio" id="q4-4-a" name="q4-4" value="A">
+                    <label for="q4-4-a">A. 다른 사람을 가르치면서 나도 더 깊이 이해할 수 있다고 생각한다.</label>
+                    <input type="radio" id="q4-4-b" name="q4-4" value="B">
+                    <label for="q4-4-b">B. 내가 아는 것을 전달하는 것이 조금 부담스럽다.</label>
+                    <input type="radio" id="q4-4-c" name="q4-4" value="C">
+                    <label for="q4-4-c">C. 나 자신에게 필요한 학습이 아니므로 별로 내키지 않는다.</label>
+                </div>
+                <div class="question" data-question-id="q4-5">
+                    <p>5. 어려운 개념을 공부할 때, 당신은 어떻게 극복하나요?</p>
+                    <input type="radio" id="q4-5-a" name="q4-5" value="A">
+                    <label for="q4-5-a">A. 이해가 될 때까지 포기하지 않고 반복해서 본다.</label>
+                    <input type="radio" id="q4-5-b" name="q4-5" value="B">
+                    <label for="q4-5-b">B. 잠시 다른 것을 하며 머리를 식힌 후 다시 돌아온다.</label>
+                    <input type="radio" id="q4-5-c" name="q4-5" value="C">
+                    <label for="q4-5-c">C. 더 쉬운 설명을 찾아보거나 다른 사람에게 도움을 요청한다.</label>
+                </div>
+            </div>
+            <div class="navigation">
+                <p class="alert" id="alert-4"></p>
+                <button class="nav-button" onclick="validateAndShowPage('page-1-4', 'page-1-5')">다음 페이지로 넘어가기</button>
+            </div>
+        </div>
+
+        <div id="page-1-5" class="page">
+            <h2>나의 강점/관심사 파악하기 (5/5)</h2>
+            <div class="progress-bar">
+                <div class="progress" id="progress-5"></div>
+            </div>
+            <div class="question-group">
+                <h4>흥미 및 가치관</h4>
+                <div class="question" data-question-id="q5-1">
+                    <p>1. 당신이 만든 것이 다른 사람에게 어떤 영향을 주기를 바라나요?</p>
+                    <input type="radio" id="q5-1-a" name="q5-1" value="A">
+                    <label for="q5-1-a">A. 편리함을 제공하여 삶을 더 효율적으로 만들어주기</label>
+                    <input type="radio" id="q5-1-b" name="q5-1" value="B">
+                    <label for="q5-1-b">B. 새로운 지식이나 영감을 주어 성장을 돕기</label>
+                    <input type="radio" id="q5-1-c" name="q5-1" value="C">
+                    <label for="q5-1-c">C. 즐거움을 주거나 감정적으로 공감해주기</label>
+                </div>
+                <div class="question" data-question-id="q5-2">
+                    <p>2. 일상에서 AI가 어떤 문제를 해결해주면 가장 좋을까요?</p>
+                    <input type="radio" id="q5-2-a" name="q5-2" value="A">
+                    <label for="q5-2-a">A. 가사 노동이나 반복적인 행정 업무</label>
+                    <input type="radio" id="q5-2-b" name="q5-2" value="B">
+                    <label for="q5-2-b">B. 개인의 건강 관리나 학습 관리</label>
+                    <input type="radio" id="q5-2-c" name="q5-2" value="C">
+                    <label for="q5-2-c">C. 창의적인 아이디어를 내는 일</label>
+                </div>
+                <div class="question" data-question-id="q5-3">
+                    <p>3. 당신이 어떤 직업을 선택할 때 가장 중요하게 생각하는 것은?</p>
+                    <input type="radio" id="q5-3-a" name="q5-3" value="A">
+                    <label for="q5-3-a">A. 꾸준한 배움과 성장의 기회가 있는가.</label>
+                    <input type="radio" id="q5-3-b" name="q5-3" value="B">
+                    <label for="q5-3-b">B. 안정적인 수입과 근무 환경을 제공하는가.</label>
+                    <input type="radio" id="q5-3-c" name="q5-3" value="C">
+                    <label for="q5-3-c">C. 사회에 긍정적인 영향을 미치는가.</label>
+                </div>
+                <div class="question" data-question-id="q5-4">
+                    <p>4. 다음 중 가장 흥미로운 AI 분야는?</p>
+                    <input type="radio" id="q5-4-a" name="q5-4" value="A">
+                    <label for="q5-4-a">A. AI를 활용해 새로운 예술 작품을 만드는 것.</label>
+                    <input type="radio" id="q5-4-b" name="q5-4" value="B">
+                    <label for="q5-4-b">B. AI를 통해 사람들의 언어나 감정을 분석하는 것.</label>
+                    <input type="radio" id="q5-4-c" name="q5-4" value="C">
+                    <label for="q5-4-c">C. AI를 통해 질병을 진단하고 치료법을 찾는 것.</label>
+                </div>
+                <div class="question" data-question-id="q5-5">
+                    <p>5. 당신을 가장 동기 부여하는 것은 무엇인가요?</p>
+                    <input type="radio" id="q5-5-a" name="q5-5" value="A">
+                    <label for="q5-5-a">A. 새로운 지식이나 기술을 배우는 것.</label>
+                    <input type="radio" id="q5-5-b" name="q5-5" value="B">
+                    <label for="q5-5-b">B. 내가 기여한 결과물이 다른 사람들에게 인정받는 것.</label>
+                    <input type="radio" id="q5-5-c" name="q5-5" value="C">
+                    <label for="q5-5-c">C. 어려운 문제를 해결하며 성취감을 느끼는 것.</label>
+                </div>
+            </div>
+            <div class="navigation">
+                <p class="alert" id="alert-5"></p>
+                <button class="nav-button" onclick="validateAndShowPage('page-1-5', 'page-2-1')">다음 페이지로 넘어가기</button>
+            </div>
+        </div>
+
+        <div id="page-2-1" class="page">
+            <h2>AI 관련 기본 지식 테스트 (1/2)</h2>
+            <div class="progress-bar">
+                <div class="progress" id="progress-6"></div>
+            </div>
+            <div class="question-group">
+                <h4>기본 개념 이해</h4>
+                <div class="question" data-question-id="q6-1">
+                    <p>1. 인공지능(AI)과 인공지능 챗봇(예: 챗GPT)의 차이를 간단히 설명해 주세요.</p>
+                    <input type="radio" id="q6-1-a" name="q6-1" value="A">
+                    <label for="q6-1-a">A. AI는 사람처럼 생각하는 기술이고, 챗봇은 단순히 대화를 흉내 내는 프로그램이다.</label>
+                    <input type="radio" id="q6-1-b" name="q6-1" value="B">
+                    <label for="q6-1-b">B. AI는 모든 컴퓨터를 통칭하는 말이고, 챗봇은 AI 기술 중 하나이다.</label>
+                    <input type="radio" id="q6-1-c" name="q6-1" value="C">
+                    <label for="q6-1-c">C. AI는 인간의 지능을 모방하는 광범위한 기술 분야이고, 챗봇은 그 기술을 활용한 응용 프로그램 중 하나이다.</label>
+                    <input type="radio" id="q6-1-d" name="q6-1" value="D">
+                    <label for="q6-1-d">D. AI는 미래 기술이고, 챗봇은 이미 완성된 기술이다.</label>
+                </div>
+                <div class="question" data-question-id="q6-2">
+                    <p>2. '데이터'가 인공지능 분야에서 왜 중요한 역할을 하는지 본인의 생각으로 설명해 주세요.</p>
+                    <input type="radio" id="q6-2-a" name="q6-2" value="A">
+                    <label for="q6-2-a">A. AI가 학습하고 판단하기 위한 원료이자 재료가 되기 때문이다.</label>
+                    <input type="radio" id="q6-2-b" name="q6-2" value="B">
+                    <label for="q6-2-b">B. 데이터가 있어야만 AI를 만들 수 있기 때문이다.</label>
+                    <input type="radio" id="q6-2-c" name="q6-2" value="C">
+                    <label for="q6-2-c">C. 데이터가 없어도 AI는 똑똑하게 작동할 수 있기 때문이다.</label>
+                    <input type="radio" id="q6-2-d" name="q6-2" value="D">
+                    <label for="q6-2-d">D. 데이터는 AI의 성능과는 전혀 관계가 없기 때문이다.</label>
+                </div>
+                <div class="question" data-question-id="q6-3">
+                    <p>3. '딥러닝(Deep Learning)'의 핵심적인 특징은 무엇인가요?</p>
+                    <input type="radio" id="q6-3-a" name="q6-3" value="A">
+                    <label for="q6-3-a">A. 단순한 계산을 반복적으로 수행하는 것</label>
+                    <input type="radio" id="q6-3-b" name="q6-3" value="B">
+                    <label for="q6-3-b">B. 정해진 규칙에 따라 인간이 직접 프로그래밍하는 것</label>
+                    <input type="radio" id="q6-3-c" name="q6-3" value="C">
+                    <label for="q6-3-c">C. 인간의 뇌 구조를 모방한 신경망을 활용하여 데이터를 학습하는 것</label>
+                    <input type="radio" id="q6-3-d" name="q6-3" value="D">
+                    <label for="q6-3-d">D. 수학 공식을 통해 모든 문제를 해결하는 것</label>
+                </div>
+                <div class="question" data-question-id="q6-4">
+                    <p>4. '자연어 처리(NLP, Natural Language Processing)' 기술을 활용한 AI 서비스는 무엇인가요?</p>
+                    <input type="radio" id="q6-4-a" name="q6-4" value="A">
+                    <label for="q6-4-a">A. 자율주행 자동차</label>
+                    <input type="radio" id="q6-4-b" name="q6-4" value="B">
+                    <label for="q6-4-b">B. 음성 비서 서비스</label>
+                    <input type="radio" id="q6-4-c" name="q6-4" value="C">
+                    <label for="q6-4-c">C. 얼굴 인식 잠금 해제</label>
+                    <input type="radio" id="q6-4-d" name="q6-4" value="D">
+                    <label for="q6-4-d">D. 주식 시장 예측 프로그램</label>
+                </div>
+                <div class="question" data-question-id="q6-5">
+                    <p>5. AI 모델이 학습 데이터를 통해 편향(Bias)을 갖게 될 때 발생할 수 있는 문제점은 무엇인가요?</p>
+                    <input type="radio" id="q6-5-a" name="q6-5" value="A">
+                    <label for="q6-5-a">A. 모델의 학습 속도가 느려진다</label>
+                    <input type="radio" id="q6-5-b" name="q6-5" value="B">
+                    <label for="q6-5-b">B. 특정 소수 집단에 대해 부정확하거나 차별적인 결과를 내놓을 수 있다</label>
+                    <input type="radio" id="q6-5-c" name="q6-5" value="C">
+                    <label for="q6-5-c">C. 모델의 용량이 너무 커진다</label>
+                    <input type="radio" id="q6-5-d" name="q6-5" value="D">
+                    <label for="q6-5-d">D. 모델이 아예 작동하지 않게 된다</label>
+                </div>
+            </div>
+            <div class="navigation">
+                <p class="alert" id="alert-6"></p>
+                <button class="nav-button" onclick="validateAndShowPage('page-2-1', 'page-2-2')">다음 페이지로 넘어가기</button>
+            </div>
+        </div>
+
+        <div id="page-2-2" class="page">
+            <h2>AI 관련 기본 지식 테스트 (2/2)</h2>
+            <div class="progress-bar">
+                <div class="progress" id="progress-7"></div>
+            </div>
+            <div class="question-group">
+                <h4>응용 및 윤리</h4>
+                <div class="question" data-question-id="q7-1">
+                    <p>1. AI 분야에서 '프롬프트 엔지니어'가 주로 담당하는 역할은 무엇인가요?</p>
+                    <input type="radio" id="q7-1-a" name="q7-1" value="A">
+                    <label for="q7-1-a">A. AI 모델을 직접 개발하고 코딩하는 것</label>
+                    <input type="radio" id="q7-1-b" name="q7-1" value="B">
+                    <label for="q7-1-b">B. AI 모델의 성능을 평가하는 데이터 수집</label>
+                    <input type="radio" id="q7-1-c" name="q7-1" value="C">
+                    <label for="q7-1-c">C. AI 모델에게 효율적이고 정확한 답변을 얻기 위해 질문을 최적화하는 것</label>
+                    <input type="radio" id="q7-1-d" name="q7-1" value="D">
+                    <label for="q7-1-d">D. AI 모델을 웹사이트나 애플리케이션에 통합하는 것</label>
+                </div>
+                <div class="question" data-question-id="q7-2">
+                    <p>2. AI 모델의 학습이 끝나고 나면, '훈련 데이터'가 아닌 '테스트 데이터'로 모델을 검증하는 이유는 무엇인가요?</p>
+                    <input type="radio" id="q7-2-a" name="q7-2" value="A">
+                    <label for="q7-2-a">A. 더 많은 데이터를 학습시키기 위해</label>
+                    <input type="radio" id="q7-2-b" name="q7-2" value="B">
+                    <label for="q7-2-b">B. 모델이 훈련 데이터에 과도하게 맞춰져 실제로는 다른 데이터에 약해지는 '과적합(Overfitting)'을 방지하기 위해</label>
+                    <input type="radio" id="q7-2-c" name="q7-2" value="C">
+                    <label for="q7-2-c">C. 모델의 속도를 더 빠르게 하기 위해</label>
+                    <input type="radio" id="q7-2-d" name="q7-2" value="D">
+                    <label for="q7-2-d">D. 훈련 데이터가 부족해서</label>
+                </div>
+                <div class="question" data-question-id="q7-3">
+                    <p>3. 인공지능을 활용하여 '이미지 속 사람, 사물, 배경을 구별하는 기술'은 어느 분야에 속하나요?</p>
+                    <input type="radio" id="q7-3-a" name="q7-3" value="A">
+                    <label for="q7-3-a">A. 음성 인식(Speech Recognition)</label>
+                    <input type="radio" id="q7-3-b" name="q7-3" value="B">
+                    <label for="q7-3-b">B. 자연어 처리(NLP)</label>
+                    <input type="radio" id="q7-3-c" name="q7-3" value="C">
+                    <label for="q7-3-c">C. 컴퓨터 비전(Computer Vision)</label>
+                    <input type="radio" id="q7-3-d" name="q7-3" value="D">
+                    <label for="q7-3-d">D. 강화 학습(Reinforcement Learning)</label>
+                </div>
+                <div class="question" data-question-id="q7-4">
+                    <p>4. 인공지능 분야에서 '데이터 라벨링(Data Labeling)'이 중요한 이유는 무엇인가요?</p>
+                    <input type="radio" id="q7-4-a" name="q7-4" value="A">
+                    <label for="q7-4-a">A. 데이터의 양을 늘리기 위해서</label>
+                    <input type="radio" id="q7-4-b" name="q7-4" value="B">
+                    <label for="q7-4-b">B. AI 모델이 학습할 수 있도록 데이터에 '정답'을 부여하기 위해서</label>
+                    <input type="radio" id="q7-4-c" name="q7-4" value="C">
+                    <label for="q7-4-c">C. 데이터를 숨겨서 AI가 접근하지 못하게 하기 위해서</label>
+                    <input type="radio" id="q7-4-d" name="q7-4" value="D">
+                    <label for="q7-4-d">D. AI 모델의 코딩 오류를 찾아내기 위해서</label>
+                </div>
+                <div class="question" data-question-id="q7-5">
+                    <p>5. 인공지능 윤리(AI Ethics) 분야에서 가장 중요하게 다루는 문제는 무엇인가요?</p>
+                    <input type="radio" id="q7-5-a" name="q7-5" value="A">
+                    <label for="q7-5-a">A. AI 기술의 성능 향상</label>
+                    <input type="radio" id="q7-5-b" name="q7-5" value="B">
+                    <label for="q7-5-b">B. AI의 개발 비용 절감</label>
+                    <input type="radio" id="q7-5-c" name="q7-5" value="C">
+                    <label for="q7-5-c">C. AI가 특정 집단에 편향된 결과를 내거나 개인정보를 침해하는 문제</label>
+                    <input type="radio" id="q7-5-d" name="q7-5" value="D">
+                    <label for="q7-5-d">D. AI 모델의 속도 최적화</label>
+                </div>
+            </div>
+            <div class="navigation">
+                <p class="alert" id="alert-7"></p>
+                <button class="nav-button" onclick="validateAndShowPage('page-2-2', 'page-results')">결과 확인하기</button>
+            </div>
+        </div>
+
+        <div id="page-results" class="page">
+            <h2>결과를 바탕으로 맞춤형 AI 직무 포트폴리오를 제공</h2>
+            <div id="results-content">
+                <p>로딩 중...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const pages = document.querySelectorAll('.page');
+        const progressBars = document.querySelectorAll('.progress');
+        let currentStage1Answers = {};
+        let currentStage2Answers = {};
+
+        function validateAndShowPage(currentPageId, nextPageId) {
+            const currentPage = document.getElementById(currentPageId);
+            const questions = currentPage.querySelectorAll('.question');
+            let allAnswered = true;
+            let questionNames = [];
+            questions.forEach(q => {
+                const name = q.querySelector('input[type="radio"]').name;
+                questionNames.push(name);
+            });
+
+            questionNames.forEach(name => {
+                const checked = currentPage.querySelector(`input[name="${name}"]:checked`);
+                if (!checked) {
+                    allAnswered = false;
+                }
+            });
+
+            const alertElement = document.getElementById(`alert-${currentPageId.split('-')[2]}`);
+            if (alertElement) {
+                alertElement.textContent = '';
+            }
+            if (nextPageId === 'page-results') {
+                const pageId = 'page-2-2';
+                const questions = document.getElementById(pageId).querySelectorAll('.question');
+                questions.forEach(q => {
+                    const name = q.querySelector('input[type="radio"]').name;
+                    const checked = document.getElementById(pageId).querySelector(`input[name="${name}"]:checked`);
+                    if (!checked) {
+                        allAnswered = false;
+                    }
+                });
+                const alertElement = document.getElementById(`alert-7`);
+                if (alertElement) {
+                    alertElement.textContent = '';
+                }
+            }
+            if (allAnswered) {
+                if (nextPageId === 'page-results') {
+                    showResults();
+                } else {
+                    showPage(nextPageId);
+                }
+            } else {
+                if (alertElement) {
+                    alertElement.textContent = '모든 질문에 답해주세요.';
+                }
+            }
+        }
+
+        function showPage(pageId) {
+            pages.forEach(page => {
+                page.classList.remove('active');
+            });
+            document.getElementById(pageId).classList.add('active');
+
+            // 진행률 업데이트
+            const pageIndex = parseInt(pageId.split('-')[1]);
+            const progressIndex = parseInt(pageId.split('-')[2]);
+            if (!isNaN(progressIndex)) {
+                progressBars.forEach((bar, index) => {
+                    if (index + 1 < progressIndex) {
+                        bar.style.width = '100%';
+                    } else if (index + 1 === progressIndex) {
+                        bar.style.width = '100%';
+                    } else {
+                        bar.style.width = '0%';
+                    }
+                });
+            } else if (pageId === 'page-results') {
+                 progressBars.forEach(bar => bar.style.width = '100%');
+            }
+        }
+
+        // 1단계 답변 저장
+        document.querySelectorAll('#page-1-1 input[type="radio"], #page-1-2 input[type="radio"], #page-1-3 input[type="radio"], #page-1-4 input[type="radio"], #page-1-5 input[type="radio"]').forEach(input => {
+            input.addEventListener('change', (event) => {
+                const questionId = event.target.name;
+                const answerValue = event.target.value;
+                currentStage1Answers[questionId] = answerValue;
+            });
+        });
+
+        // 2단계 답변 저장
+        document.querySelectorAll('#page-2-1 input[type="radio"], #page-2-2 input[type="radio"]').forEach(input => {
+            input.addEventListener('change', (event) => {
+                const questionId = event.target.name;
+                const answerValue = event.target.value;
+                currentStage2Answers[questionId] = answerValue;
+            });
+        });
+
+        function showResults() {
+            // 1단계 결과 분석
+            const scores = { '데이터 분석가': 0, 'AI 기획자': 0, 'AI 개발자': 0 };
+            const questions = {
+                'q1-1': { 'A': '데이터 분석가', 'B': 'AI 기획자', 'C': 'AI 개발자' },
+                'q1-2': { 'A': '데이터 분석가', 'B': 'AI 기획자', 'C': 'AI 기획자' },
+                'q1-3': { 'A': '데이터 분석가', 'B': 'AI 개발자', 'C': 'AI 기획자' },
+                'q1-4': { 'A': 'AI 개발자', 'B': 'AI 기획자', 'C': '데이터 분석가' },
+                'q1-5': { 'A': 'AI 개발자', 'B': 'AI 기획자', 'C': '데이터 분석가' },
+                'q2-1': { 'A': 'AI 기획자', 'B': 'AI 기획자', 'C': 'AI 개발자' },
+                'q2-2': { 'A': 'AI 기획자', 'B': 'AI 개발자', 'C': '데이터 분석가' },
+                'q2-3': { 'A': 'AI 기획자', 'B': 'AI 기획자', 'C': 'AI 기획자' },
+                'q2-4': { 'A': 'AI 기획자', 'B': 'AI 개발자', 'C': '데이터 분석가' },
+                'q2-5': { 'A': 'AI 개발자', 'B': 'AI 기획자', 'C': 'AI 기획자' },
+                'q3-1': { 'A': 'AI 기획자', 'B': '데이터 분석가', 'C': 'AI 개발자' },
+                'q3-2': { 'A': '데이터 분석가', 'B': 'AI 개발자', 'C': 'AI 기획자' },
+                'q3-3': { 'A': '데이터 분석가', 'B': 'AI 기획자', 'C': 'AI 개발자' },
+                'q3-4': { 'A': '데이터 분석가', 'B': 'AI 기획자', 'C': 'AI 기획자' },
+                'q3-5': { 'A': 'AI 개발자', 'B': 'AI 기획자', 'C': '데이터 분석가' },
+                'q4-1': { 'A': '데이터 분석가', 'B': 'AI 기획자', 'C': 'AI 개발자' },
+                'q4-2': { 'A': '데이터 분석가', 'B': 'AI 기획자', 'C': 'AI 개발자' },
+                'q4-3': { 'A': 'AI 개발자', 'B': 'AI 기획자', 'C': '데이터 분석가' },
+                'q4-4': { 'A': '데이터 분석가', 'B': 'AI 기획자', 'C': 'AI 개발자' },
+                'q4-5': { 'A': 'AI 개발자', 'B': '데이터 분석가', 'C': 'AI 기획자' },
+                'q5-1': { 'A': '데이터 분석가', 'B': 'AI 기획자', 'C': 'AI 기획자' },
+                'q5-2': { 'A': '데이터 분석가', 'B': 'AI 기획자', 'C': 'AI 개발자' },
+                'q5-3': { 'A': 'AI 개발자', 'B': 'AI 기획자', 'C': '데이터 분석가' },
+                'q5-4': { 'A': 'AI 기획자', 'B': '데이터 분석가', 'C': 'AI 개발자' },
+                'q5-5': { 'A': 'AI 개발자', 'B': 'AI 기획자', 'C': '데이터 분석가' }
+            };
+
+            for (const [key, value] of Object.entries(currentStage1Answers)) {
+                if (questions[key] && questions[key][value]) {
+                    const job = questions[key][value];
+                    scores[job]++;
+                }
+            }
+
+            const sortedJobs = Object.keys(scores).sort((a, b) => scores[b] - scores[a]);
+            const primaryJob = sortedJobs[0];
+            
+            // 2단계 점수 계산
+            const correctAnswers = {
+                'q6-1': 'C', 'q6-2': 'A', 'q6-3': 'C', 'q6-4': 'B', 'q6-5': 'B',
+                'q7-1': 'C', 'q7-2': 'B', 'q7-3': 'C', 'q7-4': 'B', 'q7-5': 'C'
+            };
+            let correctCount = 0;
+            for (const [key, value] of Object.entries(currentStage2Answers)) {
+                if (correctAnswers[key] === value) {
+                    correctCount++;
+                }
+            }
+            const knowledgeLevel = correctCount / Object.keys(correctAnswers).length * 100;
+
+            let jobRecommendation = '';
+            let portfolioRecommendation = '';
+
+            // 맞춤형 결과 생성
+            if (primaryJob === '데이터 분석가') {
+                jobRecommendation = '데이터 분석가';
+                portfolioRecommendation = `
+                    <h3>📌 당신에게 추천하는 직무: AI 데이터 분석가</h3>
+                    <p>당신은 문제 해결에 논리적이고 체계적으로 접근하는 경향이 있으며, 복잡한 정보를 정리하는 것을 즐기는군요. 이러한 강점은 **AI 데이터 분석가**에게 필수적인 자질입니다. AI 데이터 분석가는 방대한 데이터 속에서 의미 있는 패턴을 찾아내고, 이를 기반으로 AI 모델의 성능을 향상시키는 역할을 합니다.</p>
+                    <br>
+                    <h3>📝 포트폴리오 방향성</h3>
+                    <ul>
+                        <li><strong>데이터 분석 프로젝트:</strong> 공공 데이터 포털이나 Kaggle 등에서 흥미로운 데이터를 찾아 분석 보고서를 만드세요. 예를 들어, '특정 지역의 날씨 데이터와 상점 매출의 상관관계 분석' 같은 프로젝트가 좋습니다.</li>
+                        <li><strong>데이터 시각화:</strong> Tableau, Power BI, Python의 Matplotlib, Seaborn 라이브러리를 사용해 복잡한 데이터를 시각적으로 표현하는 능력을 보여주세요. 시각화가 잘 된 그래프는 당신의 분석 결과를 더욱 돋보이게 합니다.</li>
+                        <li><strong>기본 통계 및 머신러닝 모델:</strong> 회귀분석, 분류 모델 등 기초적인 통계 및 머신러닝 모델을 활용한 프로젝트를 포함하세요. AI 모델을 직접 만드는 것보다 **데이터를 이해하고 전처리하는 과정**에 집중하는 것이 중요합니다.</li>
+                    </ul>
+                `;
+            } else if (primaryJob === 'AI 기획자') {
+                jobRecommendation = 'AI 기획자';
+                portfolioRecommendation = `
+                    <h3>📌 당신에게 추천하는 직무: AI 서비스 기획자</h3>
+                    <p>당신은 주변 사람들과 소통하며 문제를 해결하고, 새로운 아이디어를 제시하는 데 강점을 보이는군요. 이러한 역량은 **AI 서비스 기획자**에게 매우 중요합니다. AI 서비스 기획자는 시장의 요구사항과 기술적 가능성을 연결하여, 사람들이 실제로 필요로 하는 AI 서비스를 구체적으로 설계하는 역할을 합니다.</p>
+                    <br>
+                    <h3>📝 포트폴리오 방향성</h3>
+                    <ul>
+                        <li><strong>문제 정의 및 솔루션 제안:</strong> 일상생활이나 특정 산업에서 AI로 해결하고 싶은 문제를 정의하고, 어떤 AI 기술을 활용해 어떻게 해결할 것인지에 대한 기획안을 만드세요. 사용자 인터뷰, 페르소나, 사용자 여정 맵 등을 포함하면 좋습니다.</li>
+                        <li><strong>서비스 와이어프레임 및 프로토타입:</strong> Figma나 Sketch 같은 툴을 사용해 당신이 기획한 AI 서비스의 화면 구성(UI/UX)을 보여주는 와이어프레임 또는 프로토타입을 제작하세요.</li>
+                        <li><strong>시장 및 기술 동향 분석:</strong> 특정 AI 기술(예: 생성형 AI, 컴퓨터 비전)의 최신 동향을 조사하고, 이를 활용한 신규 비즈니스 아이디어를 제시하는 보고서를 포함하세요. **비즈니스적 관점**에서 AI를 이해하고 있음을 보여주는 것이 중요합니다.</li>
+                    </ul>
+                `;
+            } else if (primaryJob === 'AI 개발자') {
+                jobRecommendation = 'AI 개발자';
+                portfolioRecommendation = `
+                    <h3>📌 당신에게 추천하는 직무: AI 개발자</h3>
+                    <p>당신은 논리적이고 체계적인 사고를 바탕으로 직접 문제를 해결하고, 새로운 기술을 배우는 데 열정적입니다. 이러한 특성은 **AI 개발자**에게 가장 적합합니다. AI 개발자는 AI 모델을 직접 구축하고, 학습시키며, 실제 서비스에 적용하는 기술적인 역할을 담당합니다.</p>
+                    <br>
+                    <h3>📝 포트폴리오 방향성</h3>
+                    <ul>
+                        <li><strong>머신러닝/딥러닝 프로젝트:</strong> Kaggle 대회 참여, 논문 구현, 혹은 직접 데이터를 수집하여 모델을 학습시키는 프로젝트를 진행하세요. 예: '손글씨 인식 모델', '이미지 분류 모델', '텍스트 생성 모델' 등.</li>
+                        <li><strong>코딩 능력:</strong> Python, R, C++ 등 AI 개발에 사용되는 프로그래밍 언어 능력과 TensorFlow, PyTorch, Scikit-learn 같은 프레임워크 활용 능력을 GitHub 등을 통해 보여주세요. 깔끔한 코드와 주석은 당신의 능력을 증명합니다.</li>
+                        <li><strong>기술 스택:</strong> 단순히 모델을 구현하는 것을 넘어, 데이터 전처리, 모델 튜닝, 서비스 배포(예: Flask, FastAPI)까지의 전 과정을 경험하고 이를 포트폴리오에 담으세요. **문제 해결 과정을 구체적으로 기술**하는 것이 중요합니다.</li>
+                    </ul>
+                `;
+            }
+
+            // 지식 수준에 따른 피드백 추가
+            let knowledgeFeedback = '';
+            if (knowledgeLevel >= 80) {
+                knowledgeFeedback = `
+                    <h3>💡 AI 기본 지식 수준: 매우 높음</h3>
+                    <p>AI에 대한 기본 지식 수준이 매우 높습니다. 이미 AI 분야에 대한 깊은 이해를 가지고 있군요! 이제는 단순히 지식을 습득하는 것을 넘어, 실전 프로젝트를 통해 자신만의 기술과 경험을 쌓는 데 집중해 보세요. 당신의 잠재력은 무궁무진합니다.</p>
+                `;
+            } else if (knowledgeLevel >= 50) {
+                knowledgeFeedback = `
+                    <h3>💡 AI 기본 지식 수준: 보통</h3>
+                    <p>AI에 대한 기본적인 이해를 가지고 있습니다. 지식 테스트 결과는 앞으로 더 성장할 수 있는 좋은 출발점입니다. 추천 직무와 관련된 AI 기술을 더 깊이 학습하고, 관련 용어들을 익히는 노력을 지속한다면 당신의 강점이 더욱 빛을 발할 거예요.</p>
+                `;
+            } else {
+                knowledgeFeedback = `
+                    <h3>💡 AI 기본 지식 수준: 기초</h3>
+                    <p>아직 AI에 대한 기본 지식은 부족하지만, 너무 걱정하지 마세요! 모두 처음부터 시작합니다. 추천 직무에 맞춰 필요한 AI 개념들을 차근차근 익혀나가는 것이 중요합니다. 기초적인 개념부터 시작하여 AI가 어떻게 작동하는지 이해하는 것만으로도 큰 발전이 될 것입니다.</p>
+                `;
+            }
+
+            // 결과 페이지에 내용 추가
+            const resultsContent = document.getElementById('results-content');
+            resultsContent.innerHTML = `
+                ${portfolioRecommendation}
+                <br>
+                <hr>
+                ${knowledgeFeedback}
+                <br>
+                <div style="text-align: center; margin-top: 30px;">
+                    <button class="nav-button" onclick="location.reload()">처음으로 돌아가기</button>
+                </div>
+            `;
+            showPage('page-results');
+        }
+    </script>
+</body>
+</html>
